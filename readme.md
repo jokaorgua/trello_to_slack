@@ -16,4 +16,4 @@
 5. go build
 6. start the daemon. it will setup or check hooks on its start
 
-P.S. slack user ids for relations can be found here https://api.slack.com/methods/auth.test/test
+P.S. slack user ids for relations can be found in users' profiles
