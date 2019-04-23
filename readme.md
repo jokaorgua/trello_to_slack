@@ -10,7 +10,8 @@
    5. TRELLO_USERNAME - your username in trello. the daemon will listen for events under your username and api credentials
    6. TRELLO_WEBHOOK_URL - put here absolute path where daemon is available e.g http://ip_or_domain:12345
    7. SLACK_TOKEN - get it from here https://api.slack.com/custom-integrations/legacy-tokens
-   8. CLEAR_PREVIOUS_HOOKS - set to 1 to force daemon to clear all hooks on all available dashboards before setting own
+   8. TRELLO_CLEAR_PREVIOUS_HOOKS - set to 1 to force daemon to clear all hooks on all available dashboards before setting own
+   9. LOGIN_RELATION_1 - relation of trello login to slack id. separator is | . exmaple "@test|U123456". You can create up to 100 such sections. just increment postfix
 4. go get  
 5. go build
 6. start the daemon. it will setup or check hooks on its start

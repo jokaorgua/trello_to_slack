@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/nlopes/slack"
@@ -36,8 +37,6 @@ type slackApiInterface interface {
 }
 
 func init() {
-
-	trelloSlackLoginRelations = append(trelloSlackLoginRelations, loginRelation{trello: "@dmytro489", slack: "UFYFUF5DM"})
 	log := logging.MustGetLogger("trello_to_slack")
 	logFormatter, err := logging.NewStringFormatter(`%{color}%{time:15:04:05.000} %{shortfunc} > %{level:.6s}%{color:reset} %{message}`)
 	logging.SetFormatter(logFormatter)
@@ -45,6 +44,14 @@ func init() {
 	err = godotenv.Load()
 	if err != nil {
 		log.Panic("Can not load .env file")
+	}
+	for i := 1; i < 2; i++ {
+		rel := GetEnvVar("LOGIN_RELATION_"+strconv.Itoa(i), "")
+		if len(rel) == 0 {
+			continue
+		}
+		splittedRel := strings.Split(rel, "|")
+		trelloSlackLoginRelations = append(trelloSlackLoginRelations, loginRelation{trello: splittedRel[0], slack: splittedRel[1]})
 	}
 
 	listenPort = GetEnvVar("LISTEN_PORT", "80")
