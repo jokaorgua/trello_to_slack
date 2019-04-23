@@ -97,8 +97,13 @@ func setupTrelloWebhook() {
 
 			webhook := &trello.Webhook{IDModel: board.ID, Description: "Test webhook", CallbackURL: trelloWebhookCallbackURL}
 			err := trelloClient.CreateWebhook(webhook)
+			if webhook.Active == false {
+				log.Error("Can not create webhooks for board " + board.ID + "(" + board.Name + "). Active: false")
+				continue
+			}
 			if err != nil {
 				log.Error("Can not create webhooks for board " + board.ID + "(" + board.Name + "). Error: " + err.Error())
+				continue
 			}
 			log.Info("Created webhook for board " + board.ID + "(" + board.Name + ")")
 		}
@@ -108,7 +113,7 @@ func setupTrelloWebhook() {
 
 func main() {
 	log.Info("Will listen " + serverAddr + ":" + listenPort)
-	http.ListenAndServe(serverAddr+":"+listenPort, handlers())
+	go http.ListenAndServe(serverAddr+":"+listenPort, handlers())
 	setupTrelloWebhook()
 }
 
