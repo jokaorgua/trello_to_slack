@@ -155,8 +155,10 @@ func handlers() http.Handler {
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		log.Debug("Got request")
 		w.WriteHeader(200)
-		w.Write([]byte("ok"))
-
+		_, err := w.Write([]byte("ok"))
+		if err != nil {
+			log.Error("Can not write answer to caller. Error: " + err.Error())
+		}
 		bodyBytes, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			log.Panic("Cant read request's body")
