@@ -145,11 +145,9 @@ func getWebHooksUrls(webhooks []*trello.Webhook) []string {
 
 func sendToSlack(userId string, text string, slackApi slackApiInterface) error {
 	_, _, err := slackApi.PostMessage(userId, slack.MsgOptionText(text, false))
-	if err != nil {
-		log.Error("Can not send message to slack: " + err.Error())
-		return err
-	}
+
 	return err
+
 }
 
 func handlers() http.Handler {
