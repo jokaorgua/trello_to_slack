@@ -107,9 +107,9 @@ func setupTrelloWebhook() {
 }
 
 func main() {
-	setupTrelloWebhook()
 	log.Info("Will listen " + serverAddr + ":" + listenPort)
 	http.ListenAndServe(serverAddr+":"+listenPort, handlers())
+	setupTrelloWebhook()
 }
 
 func getWebHooksUrls(webhooks []*trello.Webhook) []string {
