@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/nlopes/slack"
 
@@ -45,15 +46,7 @@ func init() {
 	if err != nil {
 		log.Panic("Can not load .env file")
 	}
-	for i := 1; i < 2; i++ {
-		rel := GetEnvVar("LOGIN_RELATION_"+strconv.Itoa(i), "")
-		if len(rel) == 0 {
-			continue
-		}
-		splittedRel := strings.Split(rel, "|")
-		trelloSlackLoginRelations = append(trelloSlackLoginRelations, loginRelation{trello: splittedRel[0], slack: splittedRel[1]})
-	}
-
+	loadLoginRelationsFromEnv(&trelloSlackLoginRelations)
 	listenPort = GetEnvVar("LISTEN_PORT", "80")
 	serverAddr = GetEnvVar("LISTEN_IP", "0.0.0.0")
 	trelloUsername = GetEnvVar("TRELLO_USERNAME", "anonymous")
@@ -64,6 +57,17 @@ func init() {
 
 	slackApi = slack.New(GetEnvVar("SLACK_TOKEN", ""))
 
+}
+
+func loadLoginRelationsFromEnv(loginRelations *[]loginRelation) {
+	for i := 1; i < 100; i++ {
+		rel := GetEnvVar("LOGIN_RELATION_"+strconv.Itoa(i), "")
+		if len(rel) == 0 {
+			continue
+		}
+		splittedRel := strings.Split(rel, "|")
+		*loginRelations = append(*loginRelations, loginRelation{trello: splittedRel[0], slack: splittedRel[1]})
+	}
 }
 func setupTrelloWebhook() {
 	trelloClient = trello.NewClient(GetEnvVar("TRELLO_APIKEY", ""), GetEnvVar("TRELLO_TOKEN", ""))
@@ -119,9 +123,15 @@ func setupTrelloWebhook() {
 }
 
 func main() {
+
+	go func() {
+		log.Debug("Will give our server some time to start. 5 seconds")
+		time.Sleep(5 * time.Second)
+		setupTrelloWebhook()
+	}()
 	log.Info("Will listen " + serverAddr + ":" + listenPort)
-	go http.ListenAndServe(serverAddr+":"+listenPort, handlers())
-	setupTrelloWebhook()
+	http.ListenAndServe(serverAddr+":"+listenPort, handlers())
+
 }
 
 func getWebHooksUrls(webhooks []*trello.Webhook) []string {
