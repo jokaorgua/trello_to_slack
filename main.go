@@ -49,7 +49,7 @@ func init() {
 	loadLoginRelationsFromEnv(&trelloSlackLoginRelations)
 	listenPort = GetEnvVar("LISTEN_PORT", "80")
 	serverAddr = GetEnvVar("LISTEN_IP", "0.0.0.0")
-	trelloUsername = GetEnvVar("TRELLO_USERNAME", "anonymous")
+	trelloUsername = strings.Replace(GetEnvVar("TRELLO_USERNAME", "anonymous"), "@", "", -1)
 	trelloWebhookCallbackURL = GetEnvVar("TRELLO_WEBHOOK_URL", "")
 	if trelloWebhookCallbackURL == "" {
 		log.Panic("Please set TRELLO_WEBHOOK_URL")
