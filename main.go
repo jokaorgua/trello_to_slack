@@ -85,22 +85,22 @@ func setupTrelloWebhook() {
 		log.Panic("Can not get boards from trello")
 	}
 	token, _ := trelloClient.GetToken(trelloClient.Token, trello.Defaults())
-	for _, board := range memberBoards {
-		webHooks, err := token.GetWebhooks(trello.Defaults())
-		if err != nil {
-			log.Error("Can not get webhooks for board " + board.ID + "(" + board.Desc + "). Error: " + err.Error())
-		}
-		if GetEnvVar("TRELLO_CLEAR_PREVIOUS_WEBHOOKS", "0") != "0" {
-			log.Info("Clearing old webhooks for board " + board.ID + "(" + board.Name + ")")
-			for _, webhook := range webHooks {
-				err = webhook.Delete(trello.Defaults())
-				if err != nil {
-					log.Error("Can not delete webhook " + webhook.ID)
-				}
+	webHooks, err := token.GetWebhooks(trello.Defaults())
+	if err != nil {
+		log.Error("Can not get webhooks for token " + token.ID + " Error: " + err.Error())
+	}
+	if GetEnvVar("TRELLO_CLEAR_PREVIOUS_WEBHOOKS", "0") != "0" {
+		log.Info("Clearing old webhooks ")
+		for _, webhook := range webHooks {
+			err = webhook.Delete(trello.Defaults())
+			if err != nil {
+				log.Error("Can not delete webhook " + webhook.ID)
 			}
-			webHooks, err = token.GetWebhooks(trello.Defaults())
 		}
-		webhooksUrls := getWebHooksUrls(webHooks)
+		webHooks, err = token.GetWebhooks(trello.Defaults())
+	}
+	for _, board := range memberBoards {
+		webhooksUrls := getBoardWebHooksUrls(webHooks, board.ID)
 		log.Debug("Current webhooks urls for board "+board.ID+"("+board.Name+")", webhooksUrls)
 
 		if !SliceContains(webhooksUrls, trelloWebhookCallbackURL) {
@@ -134,7 +134,7 @@ func main() {
 
 }
 
-func getWebHooksUrls(webhooks []*trello.Webhook) []string {
+func getBoardWebHooksUrls(webhooks []*trello.Webhook, boardId string) []string {
 	result := []string{}
 	for _, webhook := range webhooks {
 		result = append(result, webhook.CallbackURL)
