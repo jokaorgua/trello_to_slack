@@ -184,7 +184,7 @@ func handlers() http.Handler {
 			if strings.Contains(parsedRequest.Action.Data.Text, relation.trello) {
 				message := ""
 				message = "<https://trello.com/c/" + parsedRequest.Action.Data.Card.ShortLink + "|" + parsedRequest.Action.Data.Card.Name + ">\n" +
-					"> " + parsedRequest.Action.MemberCreator.FullName + ": " + parsedRequest.Action.Data.Text
+					"> " + parsedRequest.Action.MemberCreator.FullName + ": " + strings.ReplaceAll(parsedRequest.Action.Data.Text, "\n", "\n>")
 				err := sendToSlack(relation.slack, message, slackApi)
 				if err != nil {
 					log.Error("Can not send message to slack to " + relation.trello + "(" + relation.slack + ") Error: " + err.Error())
